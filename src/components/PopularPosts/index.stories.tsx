@@ -1,26 +1,42 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react";
 
-import { PopularPosts, query } from "."
-import { PopularPostsQueryFactory } from "./stub"
-import { mockLoadDecorator, mockFragmentLoader } from "../../support/storybook";
+import {
+  createCachePreloader,
+  preloadedCacheDecorator,
+} from "../../support/storybook/apollo";
+
+import { PopularPosts, query } from ".";
+import { PopularPostsQueryFactory } from "./stub";
 
 const meta = {
   title: "components/PopularPosts",
   component: PopularPosts,
-  decorators: [mockLoadDecorator],
+  decorators: [preloadedCacheDecorator],
   loaders: [
-    mockFragmentLoader(async () => {
-      return {
+    createCachePreloader()
+      .preloadQuery({
         query,
-        data: await PopularPostsQueryFactory.build(),
-      };
-    }),
+        data: PopularPostsQueryFactory.build(),
+      })
+      .toLoader(),
   ],
-} satisfies Meta
+} satisfies Meta;
 
 export default meta;
 
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<typeof meta>;
 
-export const Default = {
+export const Default = {} satisfies Story;
+
+export const Empty = {
+  loaders: [
+    createCachePreloader()
+      .preloadQuery({
+        query,
+        data: PopularPostsQueryFactory.build({
+          postsCount: 0,
+        }),
+      })
+      .toLoader(),
+  ],
 } satisfies Story;

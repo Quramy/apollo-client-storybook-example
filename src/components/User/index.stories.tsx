@@ -1,23 +1,29 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
+import {
+  createCachePreloader,
+  preloadedCacheDecorator,
+} from "../../support/storybook/apollo";
+
 import { User, fragment } from ".";
 import { UserFragmentFactory } from "./stub";
-import { mockLoadDecorator, mockFragmentLoader } from "../../support/storybook";
 
 const meta = {
   title: "components/User",
   component: User,
+  decorators: [preloadedCacheDecorator],
   loaders: [
-    mockFragmentLoader(async () => ({
-      fragment,
-      fragmentName: "User_User",
-      data: await UserFragmentFactory.build({
-        id: "user001",
-        name: "Miles",
-      }),
-    })),
+    createCachePreloader()
+      .preloadFragment({
+        fragment,
+        fragmentName: "User_User",
+        data: UserFragmentFactory.build({
+          id: "user001",
+          name: "Miles",
+        }),
+      })
+      .toLoader(),
   ],
-  decorators: [mockLoadDecorator],
 } satisfies Meta;
 
 export default meta;
@@ -35,14 +41,16 @@ export const LongName = {
     id: "user001",
   },
   loaders: [
-    mockFragmentLoader(async () => ({
-      fragment,
-      fragmentName: "User_User",
-      data: await UserFragmentFactory.build({
-        id: "user001",
-        name: "Loooooooong name",
-      }),
-    })),
+    createCachePreloader()
+      .preloadFragment({
+        fragment,
+        fragmentName: "User_User",
+        data: UserFragmentFactory.build({
+          id: "user001",
+          name: "Loooong name",
+        }),
+      })
+      .toLoader(),
   ],
 } satisfies Story;
 

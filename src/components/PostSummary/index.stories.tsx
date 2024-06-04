@@ -1,22 +1,28 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
+import {
+  createCachePreloader,
+  preloadedCacheDecorator,
+} from "../../support/storybook/apollo";
+
 import { PostSummary, fragment } from ".";
-import { mockLoadDecorator, mockFragmentLoader } from "../../support/storybook";
 import { PostFragmentFactory } from "./stub";
 
 const meta = {
   title: "components/PostSummary",
   component: PostSummary,
-  decorators: [mockLoadDecorator],
+  decorators: [preloadedCacheDecorator],
   loaders: [
-    mockFragmentLoader(async () => ({
-      fragment,
-      fragmentName: "PostSummary_Post",
-      data: await PostFragmentFactory.build({
-        id: "post001",
-        title: "Apollo Client with Storybook",
-      }),
-    })),
+    createCachePreloader()
+      .preloadFragment({
+        fragment,
+        fragmentName: "PostSummary_Post",
+        data: PostFragmentFactory.build({
+          id: "post001",
+          title: "Apollo Client with Storybook",
+        }),
+      })
+      .toLoader(),
   ],
   args: {
     id: "post001",
