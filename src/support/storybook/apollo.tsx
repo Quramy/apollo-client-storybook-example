@@ -1,39 +1,51 @@
 import type { Decorator } from "@storybook/react";
 
-import { InMemoryCache } from "@apollo/client";
+import { type ApolloCache, InMemoryCache } from "@apollo/client";
 import { MockedProvider } from "@apollo/client/testing";
 
 import type { TypedDocumentNode } from "@graphql-typed-document-node/core";
 
-type PreloadFragmentOptions<TResult extends Record<string, any>> = {
-  fragment: TypedDocumentNode<TResult>;
-  fragmentName?: string;
-  id?: string;
-  data: Resolver<TResult>;
-};
+type Resolver<TResult extends Record<string, unknown>> =
+  | TResult
+  | Promise<TResult>
+  | (() => TResult)
+  | (() => Promise<TResult>);
 
-type PreloadOperationOptions<
-  TResult extends Record<string, any>,
-  TValiables extends Record<string, any>,
-> = {
-  query: TypedDocumentNode<TResult, TValiables>;
-  data: Resolver<TResult>;
-  variables?: TValiables;
-};
-
-type Resolver<TResolved extends Record<string, any>> =
-  | TResolved
-  | Promise<TResolved>
-  | (() => TResolved)
-  | (() => Promise<TResolved>);
-
-async function resolveData<T extends Record<string, any>>(
-  resolver: Resolver<T>
-): Promise<T> {
+async function resolveData<TData extends Record<string, unknown>>(
+  resolver: Resolver<TData>
+): Promise<TData> {
   if (typeof resolver === "function") {
     return await resolver();
   }
   return await resolver;
+}
+
+type PreloadFragmentOptions<TResult extends Record<string, unknown>> = {
+  readonly fragment: TypedDocumentNode<TResult>;
+  readonly fragmentName?: string;
+  readonly id?: string;
+  readonly data: Resolver<TResult>;
+};
+
+type PreloadOperationOptions<
+  TResult extends Record<string, unknown>,
+  TValiables extends Record<string, unknown>,
+> = {
+  readonly query: TypedDocumentNode<TResult, TValiables>;
+  readonly data: Resolver<TResult>;
+  readonly variables?: TValiables;
+};
+
+const apolloCacheKey = Symbol("preloadedApolloCache");
+
+type CachePreloaderContext = {
+  readonly [apolloCacheKey]: ApolloCache<any>;
+};
+
+function isCachePreloaderContext(context: {
+  readonly loaded: unknown;
+}): context is { loaded: CachePreloaderContext } {
+  return !!(context.loaded as any)[apolloCacheKey];
 }
 
 function genDefaultId(data: { __typename?: string; id?: string }) {
@@ -43,21 +55,37 @@ function genDefaultId(data: { __typename?: string; id?: string }) {
   return undefined;
 }
 
-type CachePreloaderContext = {
-  __cache: InMemoryCache;
-};
-
-function isCachePreloaderContext(context: {
-  loaded: unknown;
-}): context is { loaded: CachePreloaderContext } {
-  return !!(context.loaded as any).__cache;
-}
-
 class CachePreloader {
-  private fragmentDefs: PreloadFragmentOptions<any>[] = [];
-  private operationDefs: PreloadOperationOptions<any, any>[] = [];
+  private fragmentDefs: PreloadFragmentOptions<Record<string, unknown>>[] = [];
+  private operationDefs: PreloadOperationOptions<
+    Record<string, unknown>,
+    any
+  >[] = [];
 
-  preloadFragment<TResult extends Record<string, any>>(
+  private async load(cache = new InMemoryCache()): Promise<ApolloCache<any>> {
+    const [fragmentDefs, operationDefs] = await Promise.all([
+      Promise.all(
+        this.fragmentDefs.map(({ data: resolver, ...rest }) =>
+          resolveData(resolver).then((data) => ({ ...rest, data }))
+        )
+      ),
+      Promise.all(
+        this.operationDefs.map(({ data: resolver, ...rest }) =>
+          resolveData(resolver).then((data) => ({ ...rest, data }))
+        )
+      ),
+    ]);
+    fragmentDefs.forEach((def) =>
+      cache.writeFragment({
+        id: genDefaultId(def.data),
+        ...def,
+      })
+    );
+    operationDefs.forEach((def) => cache.writeQuery(def));
+    return cache;
+  }
+
+  preloadFragment<TResult extends Record<string, unknown>>(
     options: PreloadFragmentOptions<TResult>
   ) {
     this.fragmentDefs.push(options);
@@ -65,43 +93,18 @@ class CachePreloader {
   }
 
   preloadQuery<
-    TResult extends Record<string, any>,
-    TValiables extends Record<string, any>,
+    TResult extends Record<string, unknown>,
+    TValiables extends Record<string, unknown>,
   >(options: PreloadOperationOptions<TResult, TValiables>) {
     this.operationDefs.push(options);
     return this;
   }
 
   toLoader() {
-    const loader = async () => {
-      const fragmentDefs = await Promise.all(
-        this.fragmentDefs.map(({ data: resolver, ...rest }) =>
-          resolveData(resolver).then((data) => ({ ...rest, data }))
-        )
-      );
-      const operationDefs = await Promise.all(
-        this.operationDefs.map(({ data: resolver, ...rest }) =>
-          resolveData(resolver).then((data) => ({ ...rest, data }))
-        )
-      );
-      const cache = new InMemoryCache();
-      for (const def of fragmentDefs) {
-        cache.writeFragment({
-          id: genDefaultId(def.data),
-          ...def,
-        });
-      }
-      for (const def of operationDefs) {
-        cache.writeQuery({
-          ...def,
-        });
-      }
-      const loaded: CachePreloaderContext = {
-        __cache: cache,
-      };
-      return loaded;
-    };
-    return loader;
+    return (): Promise<CachePreloaderContext> =>
+      this.load().then((cache) => ({
+        [apolloCacheKey]: cache,
+      }));
   }
 }
 
@@ -117,7 +120,7 @@ export const preloadedCacheDecorator: Decorator = (Story, context) => {
       </MockedProvider>
     );
   }
-  const cache = context.loaded.__cache;
+  const cache = context.loaded[apolloCacheKey];
   return (
     <MockedProvider cache={cache}>
       <Story />

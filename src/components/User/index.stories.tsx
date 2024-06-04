@@ -13,10 +13,7 @@ const meta = {
       .preloadFragment({
         fragment,
         fragmentName: "User_User",
-        data: UserFragmentFactory.build({
-          id: "user001",
-          name: "Miles",
-        }),
+        data: UserFragmentFactory.build({ id: "user001" }),
       })
       .toLoader(),
   ],
