@@ -1,9 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import {
-  createCachePreloader,
-  preloadedCacheDecorator,
-} from "../../support/storybook/apollo";
+import { createCachePreloader } from "../../support/storybook/apollo";
 
 import { PostSummary, fragment } from ".";
 import { PostFragmentFactory } from "./stub";
@@ -11,7 +8,6 @@ import { PostFragmentFactory } from "./stub";
 const meta = {
   title: "components/PostSummary",
   component: PostSummary,
-  decorators: [preloadedCacheDecorator],
   loaders: [
     createCachePreloader()
       .preloadFragment({

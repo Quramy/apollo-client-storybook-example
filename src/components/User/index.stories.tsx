@@ -1,9 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import {
-  createCachePreloader,
-  preloadedCacheDecorator,
-} from "../../support/storybook/apollo";
+import { createCachePreloader } from "../../support/storybook/apollo";
 
 import { User, fragment } from ".";
 import { UserFragmentFactory } from "./stub";
@@ -11,7 +8,6 @@ import { UserFragmentFactory } from "./stub";
 const meta = {
   title: "components/User",
   component: User,
-  decorators: [preloadedCacheDecorator],
   loaders: [
     createCachePreloader()
       .preloadFragment({
@@ -24,22 +20,18 @@ const meta = {
       })
       .toLoader(),
   ],
+  args: {
+    id: "user001",
+  },
 } satisfies Meta;
 
 export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Default = {
-  args: {
-    id: "user001",
-  },
-} satisfies Story;
+export const Default = {} satisfies Story;
 
 export const LongName = {
-  args: {
-    id: "user001",
-  },
   loaders: [
     createCachePreloader()
       .preloadFragment({

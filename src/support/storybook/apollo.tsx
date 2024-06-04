@@ -1,7 +1,6 @@
 import type { Decorator } from "@storybook/react";
 
 import { InMemoryCache } from "@apollo/client";
-import { createFragmentRegistry } from "@apollo/client/cache";
 import { MockedProvider } from "@apollo/client/testing";
 
 import type { TypedDocumentNode } from "@graphql-typed-document-node/core";
@@ -85,12 +84,7 @@ class CachePreloader {
           resolveData(resolver).then((data) => ({ ...rest, data }))
         )
       );
-      const fragments = createFragmentRegistry(
-        ...[...new Set(fragmentDefs.flatMap(({ fragment }) => fragment))]
-      );
-      const cache = new InMemoryCache({
-        fragments,
-      });
+      const cache = new InMemoryCache();
       for (const def of fragmentDefs) {
         cache.writeFragment({
           id: genDefaultId(def.data),

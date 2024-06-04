@@ -1,9 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import {
-  createCachePreloader,
-  preloadedCacheDecorator,
-} from "../../support/storybook/apollo";
+import { createCachePreloader } from "../../support/storybook/apollo";
 
 import { PopularPosts, query } from ".";
 import { PopularPostsQueryFactory } from "./stub";
@@ -11,7 +8,6 @@ import { PopularPostsQueryFactory } from "./stub";
 const meta = {
   title: "components/PopularPosts",
   component: PopularPosts,
-  decorators: [preloadedCacheDecorator],
   loaders: [
     createCachePreloader()
       .preloadQuery({

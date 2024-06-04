@@ -1,4 +1,4 @@
-import { graphql, type DocumentType } from "../../gql";
+import { graphql } from "../../gql";
 
 import { useFragment } from "@apollo/client";
 
@@ -20,7 +20,7 @@ type Props = {
 };
 
 export function PostSummary({ id }: Props) {
-  const { complete, data: post } = useFragment<DocumentType<typeof fragment>>({
+  const { complete, data: post } = useFragment({
     fragment,
     fragmentName: "PostSummary_Post",
     from: {
@@ -30,8 +30,6 @@ export function PostSummary({ id }: Props) {
   });
 
   if (!complete) return null;
-
-  console.log(post);
 
   return (
     <>
