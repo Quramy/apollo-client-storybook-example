@@ -42,7 +42,7 @@ type CachePreloaderContext = {
   readonly [apolloCacheKey]: ApolloCache<any>;
 };
 
-function isCachePreloaderLoaderContext(context: {
+function isCachePreloaderLoadersContext(context: {
   readonly loaded: unknown;
 }): context is { loaded: CachePreloaderContext } {
   return !!(context.loaded as any)[apolloCacheKey];
@@ -60,7 +60,7 @@ function getPreloadedCacheFromContext(context: {
 }) {
   if (isCachePreloaderParametersContext(context)) {
     return context.parameters[apolloCacheKey];
-  } else if (isCachePreloaderLoaderContext(context)) {
+  } else if (isCachePreloaderLoadersContext(context)) {
     return context.loaded[apolloCacheKey];
   }
   return undefined;
@@ -126,21 +126,66 @@ class CachePreloader {
   }
 }
 
+/**
+ *
+ * [Storybook loaders](https://storybook.js.org/docs/writing-stories/loaders) utility to prepare Apollo Cache instance.
+ * You can preload fragment stub data to write stories for components which depend on `useFragment` hook.
+ * 
+ * This function returns {@link CachePreloader} instance.
+ * And {@link CachePreloader#preloadFragment} method is available to write fragment data, like {@link ApolloCache#writeFragment }.
+ * 
+ * @example
+ *
+ * ```tsx
+ * const fragment = graphql(`
+ *   fragment MyComponent_User on User {
+ *     id
+ *     name
+ *   }
+ * `);
+ * 
+ * function MyComponent({ userId }: { userId: string }) {
+ *   const { complete, data } = useFragment({
+ *     fragment,
+ *     from: { __typename: "User", id: userId },
+ *   });
+ * 
+ *   if (!complete) return null;
+ * 
+ *   // render using data;
+ * }
+ * 
+ * const Meta = {
+ *   title: "MyComponent",
+ *   component: MyComponent,
+ *   loaders: createCachePreloader()
+ *     .preloadFragment({
+ *       fragment,
+ *       data: async () => ({
+ *         id: "user01",
+ *         name: "Test User",
+ *       }),
+ *     })
+ *     .toLoader(),
+ *   decorators: [preloadedCacheDecorator],
+ *   args: {
+ *     id: "user01",
+ *   },
+ * };
+ * 
+ * export default Meta;
+ * ```
+ *
+ */
 export function createCachePreloader() {
   return new CachePreloader();
 }
 
 export const preloadedCacheDecorator: Decorator = (Story, context) => {
   const cache = getPreloadedCacheFromContext(context);
-  if (!cache) {
-    return (
-      <MockedProvider>
-        <Story />
-      </MockedProvider>
-    );
-  }
+  const props = { cache };
   return (
-    <MockedProvider cache={cache}>
+    <MockedProvider {...props}>
       <Story />
     </MockedProvider>
   );
