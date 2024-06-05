@@ -69,4 +69,5 @@ export const defineUserFactory: DefineTypeFactoryInterface<
 > = defineTypeFactory;
 
 
+// FIXME suppress TS noUnusedLocals error
 export type _M = Maybe<unknown>;
