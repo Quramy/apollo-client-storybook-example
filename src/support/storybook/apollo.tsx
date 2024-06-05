@@ -36,16 +36,34 @@ type PreloadOperationOptions<
   readonly variables?: TValiables;
 };
 
-const apolloCacheKey = Symbol("preloadedApolloCache");
+const apolloCacheKey = "$apolloCache";
 
 type CachePreloaderContext = {
   readonly [apolloCacheKey]: ApolloCache<any>;
 };
 
-function isCachePreloaderContext(context: {
+function isCachePreloaderLoaderContext(context: {
   readonly loaded: unknown;
 }): context is { loaded: CachePreloaderContext } {
   return !!(context.loaded as any)[apolloCacheKey];
+}
+
+function isCachePreloaderParametersContext(context: {
+  readonly parameters: unknown;
+}): context is { parameters: CachePreloaderContext } {
+  return !!(context.parameters as any)[apolloCacheKey];
+}
+
+function getPreloadedCacheFromContext(context: {
+  readonly parameters: unknown;
+  readonly loaded: unknown;
+}) {
+  if (isCachePreloaderParametersContext(context)) {
+    return context.parameters[apolloCacheKey];
+  } else if (isCachePreloaderLoaderContext(context)) {
+    return context.loaded[apolloCacheKey];
+  }
+  return undefined;
 }
 
 function genDefaultId(data: { __typename?: string; id?: string }) {
@@ -113,14 +131,14 @@ export function createCachePreloader() {
 }
 
 export const preloadedCacheDecorator: Decorator = (Story, context) => {
-  if (!isCachePreloaderContext(context)) {
+  const cache = getPreloadedCacheFromContext(context);
+  if (!cache) {
     return (
       <MockedProvider>
         <Story />
       </MockedProvider>
     );
   }
-  const cache = context.loaded[apolloCacheKey];
   return (
     <MockedProvider cache={cache}>
       <Story />
