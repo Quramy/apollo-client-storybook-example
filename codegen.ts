@@ -14,7 +14,9 @@ const config: CodegenConfig = {
         {
           add: {
             placement: "append",
-            content: "export type _M = Maybe<unknown>;",
+            content:
+              "// FIXME suppress TS noUnusedLocals error\n" +
+              "export type _M = Maybe<unknown>;",
           },
         },
       ],
