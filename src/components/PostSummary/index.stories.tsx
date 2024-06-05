@@ -1,13 +1,25 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
+import { definePostFactory, dynamic } from "../../__generated__/fabbrica";
 import { createCachePreloader } from "../../support/storybook/apollo";
 
+import { UserFragmentFactory } from "../User/index.stories";
+
 import { PostSummary, fragment } from ".";
-import { PostFragmentFactory } from "./stub";
+
+export const PostFragmentFactory = definePostFactory({
+  defaultFields: {
+    __typename: "Post",
+    title: dynamic(({ seq }) => `Awesome blog post ${seq}`),
+    id: dynamic(({ seq }) => `post${seq}`),
+    author: dynamic(async () => await UserFragmentFactory.build()),
+  },
+});
 
 const meta = {
   title: "components/PostSummary",
   component: PostSummary,
+  excludeStories: /Factory$/,
   loaders: [
     createCachePreloader()
       .preloadFragment({

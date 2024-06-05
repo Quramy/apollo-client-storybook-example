@@ -1,13 +1,26 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
+import { defineQueryFactory, dynamic } from "../../__generated__/fabbrica";
 import { createCachePreloader } from "../../support/storybook/apollo";
 
+import { PostFragmentFactory } from "../PostSummary/index.stories";
 import { PopularPosts, query } from ".";
-import { PopularPostsQueryFactory } from "./stub";
+
+export const PopularPostsQueryFactory = defineQueryFactory.withTransientFields({
+  postsCount: 5,
+})({
+  defaultFields: {
+    __typename: "Query",
+    popularPosts: dynamic(async ({ get }) =>
+      PostFragmentFactory.buildList((await get("postsCount")) ?? 5)
+    ),
+  },
+});
 
 const meta = {
   title: "components/PopularPosts",
   component: PopularPosts,
+  excludeStories: /Factory$/,
   loaders: [
     createCachePreloader()
       .preloadQuery({
