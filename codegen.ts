@@ -9,9 +9,17 @@ const config: CodegenConfig = {
       preset: "client",
     },
     "src/__generated__/fabbrica.ts": {
-      plugins: ["@mizdra/graphql-codegen-typescript-fabbrica"],
+      plugins: [
+        "@mizdra/graphql-codegen-typescript-fabbrica",
+        {
+          add: {
+            placement: "append",
+            content: "export type _M = Maybe<unknown>;",
+          },
+        },
+      ],
       config: {
-        typesFile: "./types",
+        typesFile: "../gql/graphql",
       },
     },
   },

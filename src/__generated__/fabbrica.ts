@@ -7,7 +7,7 @@ import type {
   Post,
   Query,
   User,
-} from './types';
+} from '../gql/graphql';
 
 export * from '@mizdra/graphql-codegen-typescript-fabbrica/helper';
 
@@ -68,3 +68,5 @@ export const defineUserFactory: DefineTypeFactoryInterface<
   {}
 > = defineTypeFactory;
 
+
+export type _M = Maybe<unknown>;
