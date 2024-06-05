@@ -21,14 +21,12 @@ const meta = {
   title: "components/PopularPosts",
   component: PopularPosts,
   excludeStories: /Factory$/,
-  loaders: [
-    createCachePreloader()
-      .preloadQuery({
-        query,
-        data: PopularPostsQueryFactory.build(),
-      })
-      .toLoader(),
-  ],
+  loaders: createCachePreloader()
+    .preloadQuery({
+      query,
+      data: PopularPostsQueryFactory.build(),
+    })
+    .toLoader(),
 } satisfies Meta;
 
 export default meta;
