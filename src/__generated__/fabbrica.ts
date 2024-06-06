@@ -15,6 +15,7 @@ export type OptionalPost = {
   __typename?: 'Post';
   id?: Post['id'] | undefined;
   title?: Post['title'] | undefined;
+  description?: Post['description'] | undefined;
   body?: Post['body'] | undefined;
   author?: OptionalUser | undefined;
   createdAt?: Post['createdAt'] | undefined;

@@ -3,18 +3,26 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { definePostFactory, dynamic } from "../../__generated__/fabbrica";
 import { createCachePreloader } from "../../support/storybook/apollo";
 
-import { UserFragmentFactory } from "../User/index.stories";
+import { UserFragmentFactory } from "../Avatar/index.stories";
 
 import { PostSummary, fragment } from ".";
 
 // 1. Define fragment stub data facotry
-export const PostFragmentFactory = definePostFactory({
+export const PostFragmentFactory = definePostFactory.withTransientFields({
+  authorName: "",
+})({
   defaultFields: {
     __typename: "Post",
     title: dynamic(({ seq }) => `Awesome blog post ${seq}`),
+    description: "description description",
     id: dynamic(({ seq }) => `post${seq}`),
-    // 2. Re-use child Component's factory to build child fragment stub data
-    author: dynamic(async () => await UserFragmentFactory.build()),
+    author: dynamic(
+      async ({ get }) =>
+        // 2. Re-use child Component's factory to build child fragment stub data
+        await UserFragmentFactory.build({
+          name: (await get("authorName")) || "John",
+        })
+    ),
   },
 });
 
@@ -31,6 +39,7 @@ const meta = {
       data: PostFragmentFactory.build({
         id: "post001",
         title: "Apollo Client with Storybook",
+        authorName: "Quramy",
       }),
     })
     .toLoader(),

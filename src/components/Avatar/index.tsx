@@ -3,10 +3,9 @@ import { graphql } from "../../gql";
 import { useFragment } from "@apollo/client";
 
 export const fragment = graphql(`
-  fragment User_User on User {
-    id
+  fragment Avatar_User on User {
     name
-    createdAt
+    avatarURL
   }
 `);
 
@@ -14,10 +13,10 @@ export type Props = {
   readonly id: string;
 };
 
-export function User({ id }: Props) {
-  const { complete, data } = useFragment({
+export function Avatar({ id }: Props) {
+  const { complete, data: user } = useFragment({
     fragment,
-    fragmentName: "User_User",
+    fragmentName: "Avatar_User",
     from: {
       __typename: "User",
       id,
@@ -27,9 +26,8 @@ export function User({ id }: Props) {
   if (!complete) return null;
 
   return (
-    <div>
-      <span>{data.name}</span>&nbsp;
-      <span>(from {data.createdAt})</span>
-    </div>
+    <>
+      <img width={48} height={48} src={user.avatarURL} alt={user.name} />
+    </>
   );
 }

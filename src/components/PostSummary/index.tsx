@@ -2,15 +2,17 @@ import { graphql } from "../../gql";
 
 import { useFragment } from "@apollo/client";
 
-import { User } from "../User";
+import { Avatar } from "../Avatar";
 
 export const fragment = graphql(`
   fragment PostSummary_Post on Post {
     id
     title
+    description
     author {
       id
-      ...User_User
+      name
+      ...Avatar_User
     }
   }
 `);
@@ -33,8 +35,11 @@ export function PostSummary({ id }: Props) {
 
   return (
     <>
-      <a href={`/posts/${post.id}`}>{post.title}</a>
-      written by <User id={post.author.id} />
+      <a href={`/posts/${post.id}`}>
+        <header>{post.title}</header>
+        <p>{post.description}</p>
+        <Avatar id={post.author.id} /> <span>{post.author.name}</span>
+      </a>
     </>
   );
 }

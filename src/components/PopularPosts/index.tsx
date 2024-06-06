@@ -14,6 +14,9 @@ export const query = graphql(`
 
 export function PopularPosts() {
   const { data } = useSuspenseQuery(query);
+  if (data.popularPosts.length === 0) {
+    return <>No posts</>;
+  }
   return (
     <ul>
       {data.popularPosts.map((post) => (
