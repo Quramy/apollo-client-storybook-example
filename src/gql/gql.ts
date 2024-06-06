@@ -15,6 +15,8 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
 const documents = {
     "\n  fragment Avatar_User on User {\n    name\n    avatarURL\n  }\n": types.Avatar_UserFragmentDoc,
     "\n  query PopularPosts_Query {\n    popularPosts {\n      id\n      ...PostSummary_Post\n    }\n  }\n": types.PopularPosts_QueryDocument,
+    "\n  fragment PostDetail_Post on Post {\n    id\n    title\n    body\n    bookmarked\n    author {\n      id\n      name\n      ...Avatar_User\n    }\n  }\n": types.PostDetail_PostFragmentDoc,
+    "\n  mutation PostDetail_bookmarkPost($input: BookmarkPostInput!) {\n    bookmarkPost(input: $input) {\n      post {\n        ...PostDetail_Post\n      }\n    }\n  }\n": types.PostDetail_BookmarkPostDocument,
     "\n  fragment PostSummary_Post on Post {\n    id\n    title\n    description\n    author {\n      id\n      name\n      ...Avatar_User\n    }\n  }\n": types.PostSummary_PostFragmentDoc,
 };
 
@@ -40,6 +42,14 @@ export function graphql(source: "\n  fragment Avatar_User on User {\n    name\n 
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query PopularPosts_Query {\n    popularPosts {\n      id\n      ...PostSummary_Post\n    }\n  }\n"): (typeof documents)["\n  query PopularPosts_Query {\n    popularPosts {\n      id\n      ...PostSummary_Post\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment PostDetail_Post on Post {\n    id\n    title\n    body\n    bookmarked\n    author {\n      id\n      name\n      ...Avatar_User\n    }\n  }\n"): (typeof documents)["\n  fragment PostDetail_Post on Post {\n    id\n    title\n    body\n    bookmarked\n    author {\n      id\n      name\n      ...Avatar_User\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation PostDetail_bookmarkPost($input: BookmarkPostInput!) {\n    bookmarkPost(input: $input) {\n      post {\n        ...PostDetail_Post\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation PostDetail_bookmarkPost($input: BookmarkPostInput!) {\n    bookmarkPost(input: $input) {\n      post {\n        ...PostDetail_Post\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

@@ -24,6 +24,9 @@ const config: CodegenConfig = {
         typesFile: "../gql/graphql",
       },
     },
+    "src/__generated__/typeDefs.ts": {
+      plugins: ["scripts/gen-typedefs.cjs"],
+    },
   },
 };
 

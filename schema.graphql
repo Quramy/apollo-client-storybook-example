@@ -4,6 +4,7 @@ type Post {
   description: String!
   body: String!
   author: User!
+  bookmarked: Boolean!
   createdAt: String!
   updatedAt: String!
 }
@@ -18,4 +19,18 @@ type User {
 
 type Query {
   popularPosts: [Post!]!
+  post(postId: ID!): Post
+}
+
+input BookmarkPostInput {
+  postId: ID!
+  bookmarked: Boolean!
+}
+
+type BookmarkPostResult {
+  post: Post!
+}
+
+type Mutation {
+  bookmarkPost(input: BookmarkPostInput!): BookmarkPostResult
 }

@@ -1,9 +1,9 @@
 import type { Preview } from "@storybook/react";
 
-import { preloadedCacheDecorator } from "../src/support/storybook/apollo";
+import { apolloDecorator } from "../src/support/storybook/apollo";
 
 const preview: Preview = {
-  decorators: [preloadedCacheDecorator],
+  decorators: [apolloDecorator],
   parameters: {
     controls: {
       matchers: {

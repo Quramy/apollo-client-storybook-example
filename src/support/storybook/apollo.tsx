@@ -1,9 +1,18 @@
 import type { Decorator } from "@storybook/react";
 
-import { type ApolloCache, InMemoryCache } from "@apollo/client";
-import { MockedProvider } from "@apollo/client/testing";
+import {
+  type ApolloCache,
+  ApolloClient,
+  ApolloProvider,
+  InMemoryCache,
+} from "@apollo/client";
+import { SchemaLink } from "@apollo/client/link/schema";
+import { loadDevMessages, loadErrorMessages } from "@apollo/client/dev";
 
 import type { TypedDocumentNode } from "@graphql-typed-document-node/core";
+
+loadDevMessages();
+loadErrorMessages();
 
 type Resolver<TResult extends Record<string, unknown>> =
   | TResult
@@ -130,10 +139,10 @@ class CachePreloader {
  *
  * [Storybook loaders](https://storybook.js.org/docs/writing-stories/loaders) utility to prepare Apollo Cache instance.
  * You can preload fragment stub data to write stories for components which depend on `useFragment` hook.
- * 
+ *
  * This function returns {@link CachePreloader} instance.
  * And {@link CachePreloader#preloadFragment} method is available to write fragment data, like {@link ApolloCache#writeFragment }.
- * 
+ *
  * @example
  *
  * ```tsx
@@ -143,18 +152,18 @@ class CachePreloader {
  *     name
  *   }
  * `);
- * 
+ *
  * function MyComponent({ userId }: { userId: string }) {
  *   const { complete, data } = useFragment({
  *     fragment,
  *     from: { __typename: "User", id: userId },
  *   });
- * 
+ *
  *   if (!complete) return null;
- * 
+ *
  *   // render using data;
  * }
- * 
+ *
  * const Meta = {
  *   title: "MyComponent",
  *   component: MyComponent,
@@ -167,12 +176,12 @@ class CachePreloader {
  *       }),
  *     })
  *     .toLoader(),
- *   decorators: [preloadedCacheDecorator],
+ *   decorators: [apolloDecorator],
  *   args: {
  *     id: "user01",
  *   },
  * };
- * 
+ *
  * export default Meta;
  * ```
  *
@@ -181,12 +190,21 @@ export function createCachePreloader() {
   return new CachePreloader();
 }
 
-export const preloadedCacheDecorator: Decorator = (Story, context) => {
-  const cache = getPreloadedCacheFromContext(context);
-  const props = { cache };
+export const apolloDecorator: Decorator = (Story, context) => {
+  const cache = getPreloadedCacheFromContext(context) ?? new InMemoryCache();
+
+  const mockSchema = context.parameters.mockSchema;
+  const link = mockSchema ? new SchemaLink({ schema: mockSchema }): undefined;
+
+  const client = new ApolloClient({
+    cache,
+    link,
+    connectToDevTools: true,
+  });
+
   return (
-    <MockedProvider {...props}>
+    <ApolloProvider client={client}>
       <Story />
-    </MockedProvider>
+    </ApolloProvider>
   );
 };
