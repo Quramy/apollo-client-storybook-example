@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { createCachePreloader } from "../../support/storybook/apollo";
-import { defineUserFactory, dynamic } from "../../__generated__/fabbrica";
+import { createCachePreloader } from "@/support/storybook/apollo";
+import { defineUserFactory, dynamic } from "@/__generated__/fabbrica";
 
 import { Avatar, fragment } from ".";
 

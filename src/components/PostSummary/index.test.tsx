@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { composeStory } from "@storybook/react";
 
-import { preloadStory } from "../../support/storybook/testing";
+import { preloadStory } from "@/support/storybook/testing";
 
 import Meta, { Default } from "./index.stories";
 

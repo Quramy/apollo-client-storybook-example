@@ -1,6 +1,6 @@
-import { graphql } from "../../gql";
-
 import { useFragment, useMutation } from "@apollo/client";
+import { graphql } from "@/gql";
+
 import { Avatar } from "../Avatar";
 
 type Props = {

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { definePostFactory, dynamic } from "../../__generated__/fabbrica";
-import { createCachePreloader } from "../../support/storybook/apollo";
+import { createCachePreloader } from "@/support/storybook/apollo";
+import { definePostFactory, dynamic } from "@/__generated__/fabbrica";
 
 import { UserFragmentFactory } from "../Avatar/index.stories";
 
