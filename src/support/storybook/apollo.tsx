@@ -89,7 +89,9 @@ class CachePreloader {
     any
   >[] = [];
 
-  private async load(cache = new InMemoryCache()): Promise<ApolloCache<any>> {
+  private async loadToCache(
+    cache = new InMemoryCache()
+  ): Promise<ApolloCache<any>> {
     const [fragmentDefs, operationDefs] = await Promise.all([
       Promise.all(
         this.fragmentDefs.map(({ data: resolver, ...rest }) =>
@@ -129,9 +131,13 @@ class CachePreloader {
 
   toLoader() {
     return (): Promise<CachePreloaderContext> =>
-      this.load().then((cache) => ({
+      this.loadToCache().then((cache) => ({
         [apolloCacheKey]: cache,
       }));
+  }
+
+  async load() {
+    return this.toLoader()();
   }
 }
 
@@ -194,7 +200,7 @@ export const apolloDecorator: Decorator = (Story, context) => {
   const cache = getPreloadedCacheFromContext(context) ?? new InMemoryCache();
 
   const mockSchema = context.parameters.mockSchema;
-  const link = mockSchema ? new SchemaLink({ schema: mockSchema }): undefined;
+  const link = mockSchema ? new SchemaLink({ schema: mockSchema }) : undefined;
 
   const client = new ApolloClient({
     cache,
