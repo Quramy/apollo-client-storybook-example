@@ -1,6 +1,5 @@
-import { graphql } from "../../gql";
-
 import { useFragment } from "@apollo/client";
+import { graphql } from "@/gql";
 
 import { Avatar } from "../Avatar";
 

@@ -1,14 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/react";
-
 import { makeExecutableSchema } from "@graphql-tools/schema";
 
+import { createCachePreloader } from "@/support/storybook/apollo";
+import { typeDefs } from "@/__generated__/typeDefs";
 import {
   definePostFactory,
   defineBookmarkPostResultFactory,
   dynamic,
-} from "../../__generated__/fabbrica";
-import { typeDefs } from "../../__generated__/typeDefs";
-import { createCachePreloader } from "../../support/storybook/apollo";
+} from "@/__generated__/fabbrica";
+
 import { UserFragmentFactory } from "../Avatar/index.stories";
 
 import { PostDetail, fragment } from ".";

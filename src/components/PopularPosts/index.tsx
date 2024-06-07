@@ -1,5 +1,5 @@
 import { useSuspenseQuery } from "@apollo/client";
-import { graphql } from "../../gql";
+import { graphql } from "@/gql";
 
 import { PostSummary } from "../PostSummary";
 

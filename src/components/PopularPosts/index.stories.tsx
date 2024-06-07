@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { defineQueryFactory, dynamic } from "../../__generated__/fabbrica";
-import { createCachePreloader } from "../../support/storybook/apollo";
+import { createCachePreloader } from "@/support/storybook/apollo";
+import { defineQueryFactory, dynamic } from "@/__generated__/fabbrica";
 
 import { PostFragmentFactory } from "../PostSummary/index.stories";
 import { PopularPosts, query } from ".";
