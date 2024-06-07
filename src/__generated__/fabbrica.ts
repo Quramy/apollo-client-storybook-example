@@ -4,12 +4,64 @@ import {
 } from '@mizdra/graphql-codegen-typescript-fabbrica/helper';
 import type {
   Maybe,
+  BookmarkPostInput,
+  BookmarkPostResult,
+  Mutation,
   Post,
   Query,
   User,
 } from '../gql/graphql';
 
 export * from '@mizdra/graphql-codegen-typescript-fabbrica/helper';
+
+export type OptionalBookmarkPostInput = {
+  __typename?: 'BookmarkPostInput';
+  postId?: BookmarkPostInput['postId'] | undefined;
+  bookmarked?: BookmarkPostInput['bookmarked'] | undefined;
+};
+
+/**
+ * Define factory for {@link BookmarkPostInput} model.
+ *
+ * @param options
+ * @returns factory {@link BookmarkPostInputFactoryInterface}
+ */
+export const defineBookmarkPostInputFactory: DefineTypeFactoryInterface<
+  OptionalBookmarkPostInput,
+  {}
+> = defineTypeFactory;
+
+export type OptionalBookmarkPostResult = {
+  __typename?: 'BookmarkPostResult';
+  post?: OptionalPost | undefined;
+};
+
+/**
+ * Define factory for {@link BookmarkPostResult} model.
+ *
+ * @param options
+ * @returns factory {@link BookmarkPostResultFactoryInterface}
+ */
+export const defineBookmarkPostResultFactory: DefineTypeFactoryInterface<
+  OptionalBookmarkPostResult,
+  {}
+> = defineTypeFactory;
+
+export type OptionalMutation = {
+  __typename?: 'Mutation';
+  bookmarkPost?: Maybe<OptionalBookmarkPostResult> | undefined;
+};
+
+/**
+ * Define factory for {@link Mutation} model.
+ *
+ * @param options
+ * @returns factory {@link MutationFactoryInterface}
+ */
+export const defineMutationFactory: DefineTypeFactoryInterface<
+  OptionalMutation,
+  {}
+> = defineTypeFactory;
 
 export type OptionalPost = {
   __typename?: 'Post';
@@ -18,6 +70,7 @@ export type OptionalPost = {
   description?: Post['description'] | undefined;
   body?: Post['body'] | undefined;
   author?: OptionalUser | undefined;
+  bookmarked?: Post['bookmarked'] | undefined;
   createdAt?: Post['createdAt'] | undefined;
   updatedAt?: Post['updatedAt'] | undefined;
 };
@@ -36,6 +89,7 @@ export const definePostFactory: DefineTypeFactoryInterface<
 export type OptionalQuery = {
   __typename?: 'Query';
   popularPosts?: OptionalPost[] | undefined;
+  post?: Maybe<OptionalPost> | undefined;
 };
 
 /**
